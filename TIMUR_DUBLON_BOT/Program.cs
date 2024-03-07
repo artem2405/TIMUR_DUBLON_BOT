@@ -12,13 +12,27 @@ using static System.Net.Mime.MediaTypeNames;
 
 class Bot
 {
-    private static string token { get; set; } = "6709446843:AAFppYDafjyeLzlZz_B5Sw5bt_JOSQQN4Is"; // токен тг бота
+    private static string token = "";
     private static TelegramBotClient? client;
     private static Dictionary<string, int> LIST_OF_USERS = new Dictionary<string, int>() { { "AAA", 000 } };
     // key - никнейм пользователя , value - состояние бота в данный момент времени для данного пользователя
 
     static void Main()
     {
+        int VARIANT = 1; // 1 - ДЛЯ ТИМУРА, 2 - ДЛЯ МЕНЯ
+        if (VARIANT == 1) { token = ""; } // ТУТ НАДО ВСТАВИТЬ СВОЙ ТОКЕН ВНУТРИ КАВЫЧЕК
+        else
+        {
+            string path = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\TOKEN_FILE.txt";
+            string? line;
+            using (StreamReader reader = new StreamReader(path))
+            {
+                line = reader.ReadLine();
+                reader.Close();
+            }
+            token = line;
+        }
+
         client = new TelegramBotClient(token);
         client.StartReceiving(WrapUpdate, Error);
         Console.ReadLine();
@@ -61,7 +75,7 @@ class Bot
 
         switch (LIST_OF_USERS[message.Chat.Username])
         {
-            case 0: // ВЫБОР ВАРИАНТА РЕГИОНА
+            case 0: // ПЕРВОЕ СООБЩЕНИЕ
                 ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
                 {
                     new KeyboardButton[] { "PlayStation Россия" },
@@ -84,73 +98,102 @@ class Bot
                 break;
 
 
-            case 1: // ВЫБОР КОЛИЧЕСТВА ДУБЛОНОВ
+            case 1: // ПРОИЗОШЕЛ ВЫБОР ВАРИАНТА РЕГИОНА
 
-                REC_TO_FILE(message);
-
-                VARIANT_OF_PURCHASE(message);
-
-                int lineCount = 0;
-                using (StreamReader reader = new StreamReader(path))
+                if (STUPID_CHECK(message) == true)
                 {
-                    while (reader.ReadLine() != null)
-                    {
-                        lineCount++;
-                    }
-                    reader.Close();
-                }
+                    REC_TO_FILE(message);
 
-                if (lineCount == 1) { LIST_OF_USERS[message.Chat.Username]++; }
-                else { LIST_OF_USERS[message.Chat.Username] += 2; }
+                    VARIANT_OF_PURCHASE(message);
+
+                    int lineCount = 0;
+                    using (StreamReader reader = new StreamReader(path))
+                    {
+                        while (reader.ReadLine() != null)
+                        {
+                            lineCount++;
+                        }
+                        reader.Close();
+                    }
+
+                    if (lineCount == 1) { LIST_OF_USERS[message.Chat.Username]++; }
+                    else { LIST_OF_USERS[message.Chat.Username] += 3; }
+                }
                 
                 break;
 
-            case 2: // ВВОД ИНФОРМАЦИИ О ПОЛЬЗОВАТЕЛЕ
+            case 2: // ПРОИЗОШЕЛ ВЫБОР КОЛИЧЕСТВА ДУБЛОНОВ
                 switch (message.Text)
                 {
                     case "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄":
                         REBOOT_BOT(message);
                         break;
+
+                    default:
+                        if (STUPID_CHECK(message) == true)
+                        {
+                            REC_TO_FILE(message);
+
+                            string substringToFind = "PlayStation Россия";
+                            string lastLine = "";
+                            using (StreamReader reader = new StreamReader(path))
+                            {
+                                string line;
+                                while ((line = reader.ReadLine()) != null)
+                                {
+                                    lastLine = line;
+                                }
+                                reader.Close();
+                            }
+
+                            RUSSIA_OR_NOT(message, lastLine);
+
+                            LIST_OF_USERS[message.Chat.Username]++;
+                        }
+
+                        break;
+                }
+                break;
+
+            case 3: // ПРОИЗОШЕЛ ВВОД ЛОГИНА И ПАРОЛЯ ОТ АККАУНТА 
+                switch (message.Text)
+                {
+                    case "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️":
+                        LIST_OF_USERS[message.Chat.Username] -= 2;
+                        PREVIOUS_STEP(message);
+                        break;
+
+                    case "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄":
+                        REBOOT_BOT(message);
+                        break;
+
                     default:
                         REC_TO_FILE(message);
 
-                        string substringToFind = "PlayStation Россия";
-                        string lastLine = "";
-                        using (StreamReader reader = new StreamReader(path))
+                        ReplyKeyboardMarkup replyKeyboardMarkup3 = new(new[]
                         {
-                            string line;
-                            while ((line = reader.ReadLine()) != null)
-                            {
-                                lastLine = line;
-                            }
-                            reader.Close();
-                        }
+                            new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
+                            new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
+                        })
+                        {
+                            ResizeKeyboard = true
+                        };
 
-                        RUSSIA_OR_NOT(message, lastLine);
-
-                        //"❗ ВНИМАНИЕ! Все данные присылайте одним сообщением через запятую ❗" +
-                        //"\nПРИМЕР: Логин_От_Аккаунта, Пароль_От_Аккаунта, Ссылка_для_связи" +
-                        //"\n" +
-                        //"\nЕсли ваш аккаунт \"PlayStation Россия\", то:" +
-                        //"\n   1️⃣ Ранее заходили в свой аккаунт кораблей через мобильное приложение Legends?" +
-                        //"\n      ❶ Если ДА, то пришлите логин и пароль от аккаунта Facebook/Google, используемого для входа" +
-                        //"\n      ❷ Если НЕТ, то пришлите логин и пароль от вашего аккаунта PlayStation Россия" +
-                        //"\n   2️⃣ Пришлите ссылку для связи в соцсетях: ВК или Telegram" +
-                        //"\n" +
-                        //"\nЕсли ваш аккаунт НЕ \"PlayStation Россия\", то:" +
-                        //"\n   1️⃣ Пришлите логин и пароль от вашего аккаунта PS/Xbox" +
-                        //"\n   2️⃣ Пришлите ссылку для связи в соцсетях: ВК или Telegram",
+                        await client.SendTextMessageAsync(
+                            message.Chat.Id,
+                            "Пришлите ссылку для связи в соцсетях: ВК или Telegram",
+                            replyMarkup: replyKeyboardMarkup3);
 
                         LIST_OF_USERS[message.Chat.Username]++;
                         break;
                 }
                 break;
 
-            case 3: // БОТ ВЫВОДИТ ДЛЯ ПОЛЬЗОВАТЕЛЯ ИНФОРМАЦИЮ О РЕКВИЗИТАХ ДЛЯ ОПЛАТЫ
+            case 4: //ПРОИЗОШЕЛ ВВОД КОНТАКТНЫХ ДАННЫХ: ВК ИЛИ ТЕЛЕГРАММ   +   БОТ ВЫВОДИТ ДЛЯ ПОЛЬЗОВАТЕЛЯ ИНФОРМАЦИЮ О РЕКВИЗИТАХ ДЛЯ ОПЛАТЫ
                 switch (message.Text)
                 {
                     case "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️":
-                        LIST_OF_USERS[message.Chat.Username]-=2;
+                        LIST_OF_USERS[message.Chat.Username] -= 2;
                         PREVIOUS_STEP(message);
                         break;
 
@@ -173,19 +216,10 @@ class Bot
 
                         await client.SendTextMessageAsync(
                             message.Chat.Id,
-                            "РЕКВИЗИТЫ ДЛЯ ОПЛАТЫ: (недоступно)" +
+                            "\nСБП: <code>+79031986580</code> (Сбер, Альфа, Тинькофф)" +
                             "\n" +
-                            "\nДАЛЕЕ НАЖМИТЕ НА КНОПКУ \"ПЕРЕВОД ВЫПОЛНЕН ✅\"",
-                            //"\n" +
-                            //"\nСбер: 5228600562903361" +
-                            //"\n" +
-                            //"\nАльфа: 2200152303788700" +
-                            //"\n" +
-                            //"\nТинькофф: 5536913916132190" +
-                            //"\n" +
-                            //"\nСБП: +79031986580 (Сбер)" +
-                            //"\n" +
-                            //"\nПОСЛЕ ЗАВЕРШЕНИЯ ОПЛАТЫ НАЖМИТЕ НА КНОПКУ \"ПЕРЕВОД ВЫПОЛНЕН ✅\"",
+                            "\nПОСЛЕ ЗАВЕРШЕНИЯ ОПЛАТЫ НАЖМИТЕ НА КНОПКУ \"ПЕРЕВОД ВЫПОЛНЕН ✅\"",
+                            parseMode: ParseMode.Html,
                             replyMarkup: replyKeyboardMarkup3);
 
                         LIST_OF_USERS[message.Chat.Username]++;
@@ -194,7 +228,7 @@ class Bot
                 }
                 break;
 
-            case 4: // НАЖАТИЕ НА ФИНАЛЬНУЮ КНОПКУ
+            case 5: // ПРОИЗОШЛО НАЖАТИЕ НА ФИНАЛЬНУЮ КНОПКУ?
                 switch (message.Text)
                 {
                     case "ПЕРЕВОД ВЫПОЛНЕН ✅":
@@ -222,11 +256,11 @@ class Bot
                             reader.Close();
                         }
 
-                        await client.SendTextMessageAsync(
-                            5966876209,
-                            "НОВЫЙ ЗАКАЗ! " + 
-                            "\n" + lastLine +
-                            "\nИМЯ ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Username);
+                        //await client.SendTextMessageAsync(
+                        //    5966876209,
+                        //    "НОВЫЙ ЗАКАЗ! " + 
+                        //    "\n" + lastLine +
+                        //    "\nИМЯ ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Username);
 
                         REC_TO_FILE(message);
 
@@ -234,7 +268,7 @@ class Bot
                         break;
 
                     case "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️":
-                        lineCount = 0;
+                        int lineCount = 0;
                         using (StreamReader reader = new StreamReader(path))
                         {
                             while (reader.ReadLine() != null)
@@ -282,6 +316,27 @@ class Bot
         message.Chat.Id,
         text: "⚙️ Дополнительно ⚙️",
         replyMarkup: inlineKeyboard);
+    }
+
+    private static bool STUPID_CHECK(Message message)
+    {
+        string[] basic = new string[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄", "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️", "1250 ДУБЛОНОВ - 600 ₽",
+        "2750 ДУБЛОНОВ - 1180 ₽", "5625 ДУБЛОНОВ - 2310 ₽", "11500 ДУБЛОНОВ - 4620 ₽", "20500 ДУБЛОНОВ - 7120 ₽",
+        "30000 ДУБЛОНОВ - 10180 ₽", "47000 ДУБЛОНОВ - 15260 ₽", "🍀 1 ГОРШОК С ЗОЛОТОМ - 600 ₽", "🍀 15 ГОРШКОВ С ЗОЛОТОМ - 7200 ₽",
+        "1250 ДУБЛОНОВ - 480 ₽", "2750 ДУБЛОНОВ - 960 ₽", "5625 ДУБЛОНОВ - 1920 ₽", "11500 ДУБЛОНОВ - 3720 ₽", 
+        "20500 ДУБЛОНОВ - 6160 ₽", "30000 ДУБЛОНОВ - 9000 ₽" ,"🍀 1 ГОРШОК С ЗОЛОТОМ - 480 ₽", "🍀 15 ГОРШКОВ С ЗОЛОТОМ - 6620 ₽",
+        "20500 ДУБЛОНОВ - 1500 ₽", "🍀 1 ГОРШОК С ЗОЛОТОМ - 540 ₽", "🍀 15 ГОРШКОВ С ЗОЛОТОМ - 6980 ₽", "1250 ДУБЛОНОВ - 300 ₽", 
+        "2750 ДУБЛОНОВ - 600 ₽", "5625 ДУБЛОНОВ - 1100 ₽", "11500 ДУБЛОНОВ - 2200 ₽", "20500 ДУБЛОНОВ - 3600 ₽", 
+        "30000 ДУБЛОНОВ - 4400 ₽", "47000 ДУБЛОНОВ - 6600 ₽", "🍀 1 ГОРШОК С ЗОЛОТОМ - 420 ₽", "🍀 15 ГОРШКОВ С ЗОЛОТОМ - 5600 ₽",
+        "PlayStation Россия", "PlayStation Украина", "PlayStation Турция", "Xbox"};
+        for (int i=0; i<basic.Length; i++)
+        {
+            if (message.Text == basic[i])
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static async void VARIANT_OF_PURCHASE(Message message)
@@ -380,13 +435,12 @@ class Bot
             await client.SendTextMessageAsync(
                 message.Chat.Id,
                 "❗ ВНИМАНИЕ! Все данные присылайте одним сообщением через запятую ❗" +
-                "\nПРИМЕР: Логин_От_Аккаунта, Пароль_От_Аккаунта, Ссылка_для_связи" +
+                "\nПРИМЕР: Логин_От_Аккаунта, Пароль_От_Аккаунта" +
                 "\n" +
                 "\nЕсли ваш аккаунт \"PlayStation Россия\", то:" +
-                "\n   1️⃣ Ранее заходили в свой аккаунт кораблей через мобильное приложение Legends?" +
-                "\n      ❶ Если ДА, то пришлите логин и пароль от аккаунта Facebook/Google, используемого для входа" +
-                "\n      ❷ Если НЕТ, то пришлите логин и пароль от вашего аккаунта PlayStation Россия" +
-                "\n   2️⃣ Пришлите ссылку для связи в соцсетях: ВК или Telegram",
+                "\nВы ранее заходили в свой аккаунт кораблей через мобильное приложение Legends?" +
+                "\n   ❶ Если ДА, то пришлите логин и пароль от аккаунта Facebook/Google, используемого для входа" +
+                "\n   ❷ Если НЕТ, то пришлите логин и пароль от вашего аккаунта PlayStation Россия",
                 replyMarkup: replyKeyboardMarkup2);
         }
         else
@@ -403,11 +457,10 @@ class Bot
             await client.SendTextMessageAsync(
                 message.Chat.Id,
                 "❗ ВНИМАНИЕ! Все данные присылайте одним сообщением через запятую ❗" +
-                "\nПРИМЕР: Логин_От_Аккаунта, Пароль_От_Аккаунта, Ссылка_для_связи" +
+                "\nПРИМЕР: Логин_От_Аккаунта, Пароль_От_Аккаунта" +
                 "\n" +
                 "\nЕсли ваш аккаунт НЕ \"PlayStation Россия\", то:" +
-                "\n   1️⃣ Пришлите логин и пароль от вашего аккаунта PS/Xbox" +
-                "\n   2️⃣ Пришлите ссылку для связи в соцсетях: ВК или Telegram",
+                "\n   ❶ Пришлите логин и пароль от вашего аккаунта PS/Xbox",
                 replyMarkup: replyKeyboardMarkup2);
         }
     }
@@ -449,7 +502,7 @@ class Bot
     {
         string path = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\" + message.Chat.Username;
         List<string> lines = new List<string>(System.IO.File.ReadAllLines(path));
-        char endSymbol = '_';
+        char endSymbol = ';';
         int endIndex = lines[lines.Count - 1].LastIndexOf(endSymbol);
         if (endIndex >= 0)
         {
@@ -508,30 +561,42 @@ class Bot
                 break;
 
             case 2: // ВВОД ИНФОРМАЦИИ О ПОЛЬЗОВАТЕЛЕ
-                switch (message.Text)
+
+                string substringToFind = "PlayStation Россия";
+                lastLine = "";
+                using (StreamReader reader = new StreamReader(path))
                 {
-                    case "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄":
-                        REBOOT_BOT(message);
-                        break;
-
-                    default:
-                        string substringToFind = "PlayStation Россия";
-                        lastLine = "";
-                        using (StreamReader reader = new StreamReader(path))
-                        {
-                            string line;
-                            while ((line = reader.ReadLine()) != null)
-                            {
-                                lastLine = line;
-                            }
-                            reader.Close();
-                        }
-
-                        RUSSIA_OR_NOT(message, lastLine);
-
-                        LIST_OF_USERS[message.Chat.Username]++;
-                        break;
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        lastLine = line;
+                    }
+                    reader.Close();
                 }
+
+                RUSSIA_OR_NOT(message, lastLine);
+
+                LIST_OF_USERS[message.Chat.Username]++;
+
+                break;
+
+            case 3:
+                ReplyKeyboardMarkup replyKeyboardMarkup3 = new(new[]
+                {
+                    new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
+                    new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
+                })
+                {
+                    ResizeKeyboard = true
+                };
+
+                await client.SendTextMessageAsync(
+                    message.Chat.Id,
+                    "Пришлите ссылку для связи в соцсетях: ВК или Telegram",
+                    replyMarkup: replyKeyboardMarkup3);
+
+                LIST_OF_USERS[message.Chat.Username]++;
+
                 break;
         }
         return;
@@ -564,10 +629,10 @@ class Bot
 
         switch (LIST_OF_USERS[message.Chat.Username])
         {
-            case 4:
+            case 5:
                 using (StreamWriter writer = new StreamWriter(path, true))
                 {
-                    await writer.WriteLineAsync("_   " + mes + "   " + DateTime.Now.ToString());
+                    await writer.WriteLineAsync(";   " + mes + "   " + DateTime.Now.ToString());
                     writer.Close();
                 }
                 break;
@@ -575,7 +640,7 @@ class Bot
             default:
                 using (StreamWriter writer = new StreamWriter(path, true))
                 {
-                    await writer.WriteAsync("_   " + mes);
+                    await writer.WriteAsync(";   " + mes);
                     writer.Close();
                 }
                 break;
