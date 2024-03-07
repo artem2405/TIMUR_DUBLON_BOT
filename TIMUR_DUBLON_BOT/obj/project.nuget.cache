@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "nagg7wMXg6OR014SSueAVWj36XeqsTMFeBosnY8noz69m3Eplq12exmMBFJ9ENIMQ0fV1OMdCZRvrqaclajPSA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\artem\\Desktop\\PROGS\\TIMUR_DUBLON_BOT\\TIMUR_DUBLON_BOT\\TIMUR_DUBLON_BOT.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\artem\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
+    "C:\\Users\\artem\\.nuget\\packages\\openqa.selenium.chrome.chromedriverextensions\\1.2.0\\openqa.selenium.chrome.chromedriverextensions.1.2.0.nupkg.sha512",
+    "C:\\Users\\artem\\.nuget\\packages\\selenium.webdriver\\3.141.0\\selenium.webdriver.3.141.0.nupkg.sha512",
+    "C:\\Users\\artem\\.nuget\\packages\\telegram.bot\\19.0.0\\telegram.bot.19.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
