@@ -75,7 +75,7 @@ class Bot
 
                 await client.SendTextMessageAsync(
                     message.Chat.Id,
-                    "Выберите ваш аккаунт",
+                    "🎮 Выберите ваш аккаунт 🎮",
                     replyMarkup: replyKeyboardMarkup);
 
                 LINKS_FUNK(message);
@@ -173,17 +173,19 @@ class Bot
 
                         await client.SendTextMessageAsync(
                             message.Chat.Id,
-                            "РЕКВИЗИТЫ ДЛЯ ОПЛАТЫ:" +
+                            "РЕКВИЗИТЫ ДЛЯ ОПЛАТЫ: (недоступно)" +
                             "\n" +
-                            "\nСбер: 5228600562903361" +
-                            "\n" +
-                            "\nАльфа: 2200152303788700" +
-                            "\n" +
-                            "\nТинькофф: 5536913916132190" +
-                            "\n" +
-                            "\nСБП: +79031986580 (Сбер)" +
-                            "\n" +
-                            "\nПОСЛЕ ЗАВЕРШЕНИЯ ОПЛАТЫ НАЖМИТЕ НА КНОПКУ \"ПЕРЕВОД ВЫПОЛНЕН ✅\"",
+                            "\nДАЛЕЕ НАЖМИТЕ НА КНОПКУ \"ПЕРЕВОД ВЫПОЛНЕН ✅\"",
+                            //"\n" +
+                            //"\nСбер: 5228600562903361" +
+                            //"\n" +
+                            //"\nАльфа: 2200152303788700" +
+                            //"\n" +
+                            //"\nТинькофф: 5536913916132190" +
+                            //"\n" +
+                            //"\nСБП: +79031986580 (Сбер)" +
+                            //"\n" +
+                            //"\nПОСЛЕ ЗАВЕРШЕНИЯ ОПЛАТЫ НАЖМИТЕ НА КНОПКУ \"ПЕРЕВОД ВЫПОЛНЕН ✅\"",
                             replyMarkup: replyKeyboardMarkup3);
 
                         LIST_OF_USERS[message.Chat.Username]++;
@@ -232,7 +234,19 @@ class Bot
                         break;
 
                     case "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️":
-                        LIST_OF_USERS[message.Chat.Username] -= 2;
+                        lineCount = 0;
+                        using (StreamReader reader = new StreamReader(path))
+                        {
+                            while (reader.ReadLine() != null)
+                            {
+                                lineCount++;
+                            }
+                            reader.Close();
+                        }
+
+                        if (lineCount == 1) { LIST_OF_USERS[message.Chat.Username] -= 2; }
+                        else { LIST_OF_USERS[message.Chat.Username] -= 3; }
+
                         PREVIOUS_STEP(message);
                         break;
 
@@ -266,7 +280,7 @@ class Bot
 
         Message sentMessage = await client.SendTextMessageAsync(
         message.Chat.Id,
-        text: "Поддержка и отзывы",
+        text: "⚙️ Дополнительно ⚙️",
         replyMarkup: inlineKeyboard);
     }
 
