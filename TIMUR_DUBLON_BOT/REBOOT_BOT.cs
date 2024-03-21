@@ -17,6 +17,8 @@ partial class Bot
         LIST_OF_USERS[message.Chat.Username] = 0;
 
         string path = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\" + message.Chat.Username;
+        // string path = @"" + message.Chat.Username;
+
         List<string> lines = new List<string>(System.IO.File.ReadAllLines(path));
         lines.RemoveAt(lines.Count - 1);
         System.IO.File.WriteAllLines(path, lines);
@@ -29,7 +31,6 @@ partial class Bot
             new KeyboardButton[] { "PlayStation Украина" },
             new KeyboardButton[] { "PlayStation Турция" },
             new KeyboardButton[] { "Xbox" },
-            new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
         })
         {
             ResizeKeyboard = true
