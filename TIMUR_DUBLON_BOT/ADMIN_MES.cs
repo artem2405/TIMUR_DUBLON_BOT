@@ -11,8 +11,8 @@ partial class Bot
             string path1 = @"C:\Users\artem\Desktop\PROGS\💻💻💻ФАЙЛЫ ДЛЯ TIMUR_DUBLON_BOT💻💻💻\РАССЫЛКА.txt";
             string path2 = @"C:\Users\artem\Desktop\PROGS\💻💻💻ФАЙЛЫ ДЛЯ TIMUR_DUBLON_BOT💻💻💻\СПИСОК_ID_ПОЛЬЗОВАТЕЛЕЙ.txt";
 
-            //string path1 = @""; // ПУТЬ К ФАЙЛУ С ТЕКСТОМ РАССЫЛКИ
-            //string path2 = @""; // ПУТЬ К ФАЙЛУ СО СПИСКОМ ПОЛЬЗОВАТЕЛЕЙ ДЛЯ РАССЫЛКИ
+            //string path1 = @"/data/Pictures/РАССЫЛКА.txt"; // ПУТЬ К ФАЙЛУ С ТЕКСТОМ РАССЫЛКИ
+            //string path2 = @"/data/Pictures/ID"; // ПУТЬ К ФАЙЛУ СО СПИСКОМ ПОЛЬЗОВАТЕЛЕЙ ДЛЯ РАССЫЛКИ
 
             string text = "";
             using (StreamReader reader = new StreamReader(path1)) { text = await reader.ReadToEndAsync(); reader.Close(); }
@@ -20,7 +20,10 @@ partial class Bot
             using (StreamReader reader = new StreamReader(path2)) 
             {
                 string line;
+
                 string path = @"C:\Users\artem\Desktop\PROGS\💻💻💻ФАЙЛЫ ДЛЯ TIMUR_DUBLON_BOT💻💻💻\РАССЫЛКА.jpg";
+                // string path = @"/data/Users/РАССЫЛКА.png";
+
                 while ((line = reader.ReadLine()) != null)
                 {
                     using (FileStream stream = new FileStream(path, FileMode.Open))

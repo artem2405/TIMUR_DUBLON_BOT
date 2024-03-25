@@ -30,7 +30,7 @@ partial class Bot
         RASSYLKA_DATABASE(message); // ЗАПИСЬ ПОЛЬЗОВАТЕЛЯ В СПИСОК ПОЛЬЗОВАТЕЛЕЙ ДЛЯ РАССЫЛКИ
 
         string path = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\" + message.Chat.Username;
-        // string path = @"" + message.Chat.Username;
+        // string path = @"/data/Users" + message.Chat.Username;
 
         Console.WriteLine();
         Console.WriteLine($"От пользователя {message.Chat.Username} пришло сообщение с текстом: {message.Text}");
@@ -45,6 +45,7 @@ partial class Bot
                     new KeyboardButton[] { "PlayStation Украина" },
                     new KeyboardButton[] { "PlayStation Турция" },
                     new KeyboardButton[] { "Xbox" },
+                    new KeyboardButton[] { "iOS/Android" }
                 })
                 {
                     ResizeKeyboard = true
@@ -87,7 +88,6 @@ partial class Bot
                         {
                             REC_TO_FILE(message);
 
-                            string substringToFind = "PlayStation Россия";
                             string lastLine = "";
                             using (StreamReader reader = new StreamReader(path))
                             {
@@ -157,24 +157,27 @@ partial class Bot
                         break;
 
                     default:
-                        REC_TO_FILE(message);
 
-                        ReplyKeyboardMarkup replyKeyboardMarkup3 = new(new[]
+                        if ((LINE_COUNT(path) == 1) || (STUPID_CHECK(message) == true && LINE_COUNT(path) > 1))
                         {
-                            new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
-                            new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
-                        })
-                        {
-                            ResizeKeyboard = true
-                        };
+                            REC_TO_FILE(message);
 
-                        await client.SendTextMessageAsync(
-                            message.Chat.Id,
-                            "Пришлите ТЕКСТОВУЮ ссылку для связи в соцсетях: ВК или Telegram",
-                            replyMarkup: replyKeyboardMarkup3);
+                            ReplyKeyboardMarkup replyKeyboardMarkup3 = new(new[]
+                            {
+                                new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
+                                new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
+                            })
+                            {
+                                ResizeKeyboard = true
+                            };
 
-                        LIST_OF_USERS[message.Chat.Username]++;
+                            await client.SendTextMessageAsync(
+                                message.Chat.Id,
+                                "Пришлите ТЕКСТОВУЮ ссылку для связи в соцсетях: ВК или Telegram",
+                                replyMarkup: replyKeyboardMarkup3);
 
+                            LIST_OF_USERS[message.Chat.Username]++;
+                        }
                         break;
                 }
                 break;

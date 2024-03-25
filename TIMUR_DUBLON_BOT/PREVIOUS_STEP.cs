@@ -15,7 +15,7 @@ partial class Bot
     private static async void PREVIOUS_STEP(Message message) // ВОЗВРАЩЕНИЕ НА ПРЕДЫДУЩИЙ ШАГ
     {
         string path = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\" + message.Chat.Username;
-        // string path = @"" + message.Chat.Username;
+        // string path = @"/data/Users" + message.Chat.Username;
 
         List<string> lines = new List<string>(System.IO.File.ReadAllLines(path));
         char endSymbol = ';';
@@ -43,6 +43,7 @@ partial class Bot
                 string substringToFind2 = "PlayStation Украина";
                 string substringToFind3 = "PlayStation Турция";
                 string substringToFind4 = "Xbox";
+                string substringToFind5 = "iOS/Android";
                 string lastLine = "";
                 using (StreamReader reader = new StreamReader(path))
                 {
@@ -58,6 +59,7 @@ partial class Bot
                 else if (lastLine.Contains(substringToFind2)) { message.Text = substringToFind2; }
                 else if (lastLine.Contains(substringToFind3)) { message.Text = substringToFind3; }
                 else if (lastLine.Contains(substringToFind4)) { message.Text = substringToFind4; }
+                else if (lastLine.Contains(substringToFind5)) { message.Text = substringToFind5; }
 
                 VARIANT_OF_PURCHASE(message);
 
@@ -77,7 +79,6 @@ partial class Bot
                 break;
 
             case 2: // ПРОИЗОШЕЛ ВЫБОР КОЛИЧЕСТВА ДУБЛОНОВ
-                string substringToFind = "PlayStation Россия";
                 lastLine = "";
                 using (StreamReader reader = new StreamReader(path))
                 {
@@ -126,7 +127,7 @@ partial class Bot
 
                 await client.SendTextMessageAsync(
                     message.Chat.Id,
-                    "Пришлите ссылку для связи в соцсетях: ВК или Telegram",
+                    "Пришлите ТЕКСТОВУЮ ссылку для связи в соцсетях: ВК или Telegram",
                     replyMarkup: replyKeyboardMarkup4);
 
                 LIST_OF_USERS[message.Chat.Username]++;

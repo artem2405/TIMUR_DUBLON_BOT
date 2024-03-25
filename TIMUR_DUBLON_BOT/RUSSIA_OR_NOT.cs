@@ -15,9 +15,10 @@ partial class Bot
 {
     private static async void RUSSIA_OR_NOT(Message message, string lastLine) // ПРОВЕРКА АККАУНТА: PS RU ИЛИ КАКОЙ-ТО ДРУГОЙ
     {
-        string substringToFind = "PlayStation Россия";
+        string substringToFind1 = "PlayStation Россия";
+        string substringToFind2 = "iOS/Android";
 
-        if (lastLine != null && lastLine.Contains(substringToFind))
+        if (lastLine != null && lastLine.Contains(substringToFind1))
         {
             ReplyKeyboardMarkup replyKeyboardMarkup2 = new(new[]
             {
@@ -30,13 +31,28 @@ partial class Bot
 
             await client.SendTextMessageAsync(
                 message.Chat.Id,
-                //"❗ ВНИМАНИЕ! Все данные присылайте одним сообщением через запятую ❗" +
-                //"\nПРИМЕР: Логин_От_Аккаунта, Пароль_От_Аккаунта" +
-                //"\n" +
-                "\nЕсли ваш аккаунт \"PlayStation Россия\", то:" +
                 "\nВы ранее заходили в свой аккаунт кораблей через мобильное приложение Legends?" +
-                "\n   ❶ Если ДА, то пришлите логин от аккаунта Facebook/Google, используемого для входа" +
+                "\n   ❶ Если ДА, то пришлите логин от аккаунта Facebook/Google, используемого для входа, " +
+                "\n      с указанием способа входа - Facebook или Google" +
                 "\n   ❷ Если НЕТ, то пришлите логин от вашего аккаунта PlayStation Россия",
+                replyMarkup: replyKeyboardMarkup2);
+        }
+        else if (lastLine != null && lastLine.Contains(substringToFind2)) 
+        {
+            ReplyKeyboardMarkup replyKeyboardMarkup2 = new(new[]
+{
+                new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
+                new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
+            })
+            {
+                ResizeKeyboard = true
+            };
+
+            await client.SendTextMessageAsync(
+                message.Chat.Id,
+                "\nЕсли ваш аккаунт \"iOS/Android\", то:" +
+                "\n   ❶ В настройках игры привяжите пустой аккаунт Xbox" +
+                "\n   ❷ Пришлите логин от вашего аккаунта Xbox",
                 replyMarkup: replyKeyboardMarkup2);
         }
         else
@@ -52,11 +68,7 @@ partial class Bot
 
             await client.SendTextMessageAsync(
                 message.Chat.Id,
-                //"❗ ВНИМАНИЕ! Все данные присылайте одним сообщением через запятую ❗" +
-                //"\nПРИМЕР: Логин_От_Аккаунта, Пароль_От_Аккаунта" +
-                //"\n" +
-                "\nЕсли ваш аккаунт НЕ \"PlayStation Россия\", то:" +
-                "\n   ❶ Пришлите логин от вашего аккаунта PS/Xbox",
+                "\n❶ Пришлите логин от вашего аккаунта PS/Xbox",
                 replyMarkup: replyKeyboardMarkup2);
         }
     }

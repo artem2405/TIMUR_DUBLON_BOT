@@ -15,7 +15,7 @@ partial class Bot
     private static async void REC_TO_FILE(Message message) // ЗАПИСЬ ИНФОРМАЦИИ В ФАЙЛ СО СПИСКОМ ЗАКАЗОВ ПОЛЬЗОВАТЕЛЯ
     {
         string path1 = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT";
-        // string path1 = @"";
+        // string path1 = @"/data/Users";
 
         string path = path1 + @"\" + message.Chat.Username;
         //string path = path1 + message.Chat.Username;

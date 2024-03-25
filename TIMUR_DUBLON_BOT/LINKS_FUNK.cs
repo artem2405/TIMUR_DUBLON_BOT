@@ -22,11 +22,15 @@ partial class Bot
             },
             new[]
             {
-                InlineKeyboardButton.WithUrl( text: "ОТЗЫВЫ", url: "https://t.me/wowslegendsdoubloons/21"),
+                InlineKeyboardButton.WithUrl( text: "ОТЗЫВЫ", url: "https://t.me/wowslegendsdoubloons_fb"),
             },
             new[]
             {
                 InlineKeyboardButton.WithUrl( text: "Игры и подписки PS", url: "https://t.me/psforjoy"),
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithUrl( text: "Игры и подписки Xbox", url: "https://t.me/xboxforjoy"),
             },
         });
 

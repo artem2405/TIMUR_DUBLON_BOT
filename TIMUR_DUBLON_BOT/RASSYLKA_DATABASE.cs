@@ -10,14 +10,11 @@ partial class Bot
 {
     private static async void RASSYLKA_DATABASE(Message message)
     {
-        string path1 = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT";
-        // string path1 = @"";
-
-        string path2 = @"C:\Users\artem\Desktop\PROGS\💻💻💻ФАЙЛЫ ДЛЯ TIMUR_DUBLON_BOT💻💻💻\СПИСОК_ID_ПОЛЬЗОВАТЕЛЕЙ.txt";
-        // string path1 = @"";
+        string path1 = @"C:\Users\artem\Desktop\PROGS\💻💻💻ФАЙЛЫ ДЛЯ TIMUR_DUBLON_BOT💻💻💻\СПИСОК_ID_ПОЛЬЗОВАТЕЛЕЙ.txt";
+        // string path1 = @"/data/Pictures/ID";
 
         List<string> lines = new List<string>();
-        using (StreamReader reader = new StreamReader(path2))
+        using (StreamReader reader = new StreamReader(path1))
         {
             string line;
             while ((line = reader.ReadLine()) != null)
@@ -40,7 +37,7 @@ partial class Bot
         {
             using (FileStream fs = System.IO.File.Create(message.Chat.Username)) { fs.Close(); }
 
-            using (StreamWriter writer = new StreamWriter(path2, true))
+            using (StreamWriter writer = new StreamWriter(path1, true))
             {
                 await writer.WriteLineAsync(message.Chat.Id.ToString());
                 writer.Close();
