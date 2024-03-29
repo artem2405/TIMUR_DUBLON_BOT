@@ -9,6 +9,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Net.WebRequestMethods;
 
 partial class Bot
 {
@@ -62,7 +63,7 @@ partial class Bot
                 break;
 
 
-            case 1: // ПРОИЗОШЕЛ ВЫБОР ВАРИАНТА РЕГИОНА
+            case 1: // ПРОИЗОШЕЛ ВЫБОР РЕГИОНА
 
                 if (STUPID_CHECK(message) == true)
                 {
@@ -213,9 +214,15 @@ partial class Bot
                         default:
                             REC_TO_FILE(message);
 
+                            char targetChar = '₽';
+                            string fileContent = System.IO.File.ReadAllText(path);
+                            int Index = fileContent.IndexOf(targetChar);
+                            int startIndex = fileContent.LastIndexOf('-', Index);
+                            string parsedString = fileContent.Substring(startIndex + 1, Index - startIndex - 1);
+
                             ReplyKeyboardMarkup replyKeyboardMarkup3 = new(new[]
                             {
-                                new KeyboardButton[] { "ПЕРЕВОД ВЫПОЛНЕН ✅" },
+                                // new KeyboardButton[] { "ПЕРЕВОД ВЫПОЛНЕН ✅" },
                                 new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
                                 new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
                             })
@@ -225,9 +232,12 @@ partial class Bot
 
                             await client.SendTextMessageAsync(
                                 message.Chat.Id,
+                                "СУММА К ОПЛАТЕ:<code>" + parsedString + "</code>₽" +
+                                "\n" +
                                 "\nСБП: <code>+79031986580</code> (Сбер, Альфа, Тинькофф)" +
                                 "\n" +
-                                "\nПОСЛЕ ЗАВЕРШЕНИЯ ОПЛАТЫ НАЖМИТЕ НА КНОПКУ \"ПЕРЕВОД ВЫПОЛНЕН ✅\"",
+                                //"\nПОСЛЕ ЗАВЕРШЕНИЯ ОПЛАТЫ НАЖМИТЕ НА КНОПКУ \"ПЕРЕВОД ВЫПОЛНЕН ✅\"",
+                                "\nПОСЛЕ ЗАВЕРШЕНИЯ ОПЛАТЫ ОТПРАВЬТЕ СКРИНШОТ ОПЛАТЫ",
                                 parseMode: ParseMode.Html,
                                 replyMarkup: replyKeyboardMarkup3);
 
@@ -239,53 +249,131 @@ partial class Bot
                 break;
 
             case 6: // ПРОИЗОШЛО НАЖАТИЕ НА ФИНАЛЬНУЮ КНОПКУ?
-                switch (message.Text)
+                i = 1;
+                if ((message.Type == MessageType.Photo || message.Type == MessageType.Document) && i == 1)
                 {
-                    case "ПЕРЕВОД ВЫПОЛНЕН ✅":
-                        ReplyKeyboardMarkup replyKeyboardMarkup4 = new(new[]
-                        {
-                            new KeyboardButton[] { "СОЗДАТЬ НОВЫЙ ЗАКАЗ" },
-                        })
-                        {
-                            ResizeKeyboard = true
-                        };
+                    Random rnd = new Random();
+                    string path1 = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\" + message.Chat.Username + @"_ССЫЛКА_" + rnd.Next(0, 1000000) + ".jpg";
 
-                        await client.SendTextMessageAsync(
-                            message.Chat.Id,
-                            "Спасибо за заказ! В ближайшее время администратор с вами свяжется",
-                            replyMarkup: replyKeyboardMarkup4);
+                    if (message.Type == MessageType.Photo)
+                    {
+                        string fileId = message.Photo[message.Photo.Length - 1].FileId;
 
-                        string lastLine = ""; // ПОИСК ПОСЛЕДНЕЙ СТРОКИ В ФАЙЛЕ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ ДЛЯ ОТПРАВКИ АДМИНИСТРАТОРУ
-                        using (StreamReader reader = new StreamReader(path))
+                        using (FileStream stream = new FileStream(path1, FileMode.Create))
                         {
-                            string line;
-                            while ((line = reader.ReadLine()) != null)
-                            {
-                                lastLine = line;
-                            }
-                            reader.Close();
+                            await client.GetInfoAndDownloadFileAsync(fileId, stream);
+                            stream.Close();
                         }
+                    }
+                    if (message.Type == MessageType.Document)
+                    {
+                        string fileId = message.Document.FileId;
 
-                        //await client.SendTextMessageAsync(
-                        //    ,
-                        //    "НОВЫЙ ЗАКАЗ! " + 
-                        //    "\n" + lastLine +
-                        //    "\nИМЯ ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Username + ";  ID ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Id);
+                        using (FileStream stream = new FileStream(path1, FileMode.Create))
+                        {
+                            await client.GetInfoAndDownloadFileAsync(fileId, stream);
+                            stream.Close();
+                        }
+                    }
 
-                        REC_TO_FILE(message);
+                    ReplyKeyboardMarkup replyKeyboardMarkup4 = new(new[]
+                    {
+                        new KeyboardButton[] { "🆕 СОЗДАТЬ НОВЫЙ ЗАКАЗ 🆕" },
+                    })
+                    {
+                        ResizeKeyboard = true
+                    };
 
-                        LIST_OF_USERS[message.Chat.Username] = 0;
-                        break;
+                    await client.SendTextMessageAsync(
+                        message.Chat.Id,
+                        "Спасибо за заказ! В ближайшее время администратор с вами свяжется",
+                        replyMarkup: replyKeyboardMarkup4);
 
-                    case "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️":
-                        LIST_OF_USERS[message.Chat.Username] -= 2;
-                        PREVIOUS_STEP(message);
-                        break;
+                    string lastLine = ""; // ПОИСК ПОСЛЕДНЕЙ СТРОКИ В ФАЙЛЕ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ ДЛЯ ОТПРАВКИ АДМИНИСТРАТОРУ
+                    using (StreamReader reader = new StreamReader(path))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            lastLine = line;
+                        }
+                        reader.Close();
+                    }
 
-                    case "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄":
-                        REBOOT_BOT(message);
-                        break;
+                    using (FileStream stream = new FileStream(path1, FileMode.Open))
+                    {
+                        InputFileStream input = new InputFileStream(stream);
+                        await client.SendPhotoAsync(
+                            chatId: 432771577, // ВВЕСТИ СВОЙ АЙДИ ИЗ ТЕЛЕГРАМА
+                            photo: input,
+                            caption:
+                            "НОВЫЙ ЗАКАЗ! " +
+                            "\n" + lastLine +
+                            "\nИМЯ ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Username + ";  ID ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Id,
+                            parseMode: ParseMode.Html);
+                    }
+
+                    //await client.SendTextMessageAsync(
+                    //    ,
+                    //    "НОВЫЙ ЗАКАЗ! " + 
+                    //    "\n" + lastLine +
+                    //    "\nИМЯ ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Username + ";  ID ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Id);
+
+                    REC_TO_FILE(message);
+
+                    LIST_OF_USERS[message.Chat.Username] = 0;
                 }
+                else
+                {
+                    switch (message.Text)
+                    {
+                        //case "ПЕРЕВОД ВЫПОЛНЕН ✅":
+                        //    ReplyKeyboardMarkup replyKeyboardMarkup4 = new(new[]
+                        //    {
+                        //        new KeyboardButton[] { "🆕 СОЗДАТЬ НОВЫЙ ЗАКАЗ 🆕" },
+                        //    })
+                        //    {
+                        //        ResizeKeyboard = true
+                        //    };
+
+                        //    await client.SendTextMessageAsync(
+                        //        message.Chat.Id,
+                        //        "Спасибо за заказ! В ближайшее время администратор с вами свяжется",
+                        //        replyMarkup: replyKeyboardMarkup4);
+
+                        //    string lastLine = ""; // ПОИСК ПОСЛЕДНЕЙ СТРОКИ В ФАЙЛЕ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ ДЛЯ ОТПРАВКИ АДМИНИСТРАТОРУ
+                        //    using (StreamReader reader = new StreamReader(path))
+                        //    {
+                        //        string line;
+                        //        while ((line = reader.ReadLine()) != null)
+                        //        {
+                        //            lastLine = line;
+                        //        }
+                        //        reader.Close();
+                        //    }
+
+                        //    //await client.SendTextMessageAsync(
+                        //    //    ,
+                        //    //    "НОВЫЙ ЗАКАЗ! " + 
+                        //    //    "\n" + lastLine +
+                        //    //    "\nИМЯ ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Username + ";  ID ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Id);
+
+                        //    REC_TO_FILE(message);
+
+                        //    LIST_OF_USERS[message.Chat.Username] = 0;
+                        //    break;
+
+                        case "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️":
+                            LIST_OF_USERS[message.Chat.Username] -= 2;
+                            PREVIOUS_STEP(message);
+                            break;
+
+                        case "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄":
+                            REBOOT_BOT(message);
+                            break;
+                    }
+                }
+                
                 break;
         }
     }

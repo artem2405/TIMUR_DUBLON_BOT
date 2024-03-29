@@ -32,7 +32,7 @@ partial class Bot
             case 6:
                 using (StreamWriter writer = new StreamWriter(path, true))
                 {
-                    await writer.WriteLineAsync(";   " + message.Text + "   " + DateTime.Now.ToString());
+                    await writer.WriteLineAsync(";   ПЕРЕВОД ВЫПОЛНЕН ✅   " + DateTime.Now.ToString());
                     writer.Close();
                 }
                 break;
