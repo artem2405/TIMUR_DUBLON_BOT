@@ -20,7 +20,7 @@ partial class Bot
 
         if (lastLine != null && lastLine.Contains(substringToFind1))
         {
-            ReplyKeyboardMarkup replyKeyboardMarkup2 = new(new[]
+            ReplyKeyboardMarkup replyKeyboardMarkup1 = new(new[]
             {
                 new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
                 new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
@@ -35,7 +35,7 @@ partial class Bot
                 "\n   ❶ Если ДА, то пришлите логин от аккаунта Facebook/Google, используемого для входа, " +
                 "\n      с указанием способа входа - Facebook или Google" +
                 "\n   ❷ Если НЕТ, то пришлите логин от вашего аккаунта PlayStation Россия",
-                replyMarkup: replyKeyboardMarkup2);
+                replyMarkup: replyKeyboardMarkup1);
         }
         else if (lastLine != null && lastLine.Contains(substringToFind2)) 
         {
@@ -57,7 +57,7 @@ partial class Bot
         }
         else
         {
-            ReplyKeyboardMarkup replyKeyboardMarkup2 = new(new[]
+            ReplyKeyboardMarkup replyKeyboardMarkup3 = new(new[]
             {
                 new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
                 new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
@@ -69,7 +69,7 @@ partial class Bot
             await client.SendTextMessageAsync(
                 message.Chat.Id,
                 "\n❶ Пришлите логин от вашего аккаунта PS/Xbox",
-                replyMarkup: replyKeyboardMarkup2);
+                replyMarkup: replyKeyboardMarkup3);
         }
     }
 }

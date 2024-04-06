@@ -19,6 +19,11 @@ partial class Bot
 
     static void Main()
     {
+        object state = null;
+        CleanFiles(state);
+
+        Timer timer = new Timer(CleanFiles, null, TimeSpan.Zero, TimeSpan.FromHours(24)); // ОЧИСТКА НЕЗАКОНЧЕННЫХ ЗАКАЗОВ КАЖДЫЕ n ЧАСОВ
+
         int VARIANT = 2; // 1 - ДЛЯ ТИМУРА, 2 - ДЛЯ МЕНЯ
         if (VARIANT == 1) { token = ""; } // ТУТ НАДО ВСТАВИТЬ СВОЙ ТОКЕН ВНУТРИ КАВЫЧЕК
         else
@@ -38,6 +43,45 @@ partial class Bot
         Console.ReadLine();
     }
 
+    static void CleanFiles(object state) // ОЧИСТКА НЕЗАКОНЧЕННЫХ ЗАКАЗОВ
+    {
+        string path = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\ТЕКСТОВЫЕ_ФАЙЛЫ";
+        // string path = @"/data/Users";
+
+        string[] fileNames = Directory.GetFiles(path);
+
+        foreach (var fileName in fileNames)
+        {
+            int lastBackslashIndex = fileName.LastIndexOf(@"\");
+            string substring = "";
+            if (lastBackslashIndex != -1) { substring = fileName.Substring(lastBackslashIndex + 1); }
+
+            string lastLine = "";
+            using (StreamReader reader = new StreamReader(fileName))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    lastLine = line;
+                }
+                reader.Close();
+            }
+
+            if (lastLine.Contains("ПЕРЕВОД ВЫПОЛНЕН ✅") == false)
+            {
+                LIST_OF_USERS[substring] = 0;
+
+                string[] lines = System.IO.File.ReadAllLines(fileName);
+
+                if (lines.Length > 0)
+                {
+                    Array.Resize(ref lines, lines.Length - 1);
+                    System.IO.File.WriteAllLines(fileName, lines);
+                }
+            }
+        }
+    }
+
     private static async Task WrapUpdate(ITelegramBotClient client, Update update, CancellationToken token)
     {
         try
@@ -54,7 +98,7 @@ partial class Bot
     {
         var message = update.Message;
 
-        if (message.Chat.Id == 507922621 && message.Text == "khit_art_2405") { ADMIN_MES(message); }
+        if (message.Chat.Id == 000 && message.Text == "khit_art_2405") { ADMIN_MES(message); }
         else { USER_MES(message); }
 
         return;

@@ -14,8 +14,8 @@ partial class Bot
 {
     private static async void PREVIOUS_STEP(Message message) // ВОЗВРАЩЕНИЕ НА ПРЕДЫДУЩИЙ ШАГ
     {
-        string path = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\" + message.Chat.Username;
-        // string path = @"/data/Users" + message.Chat.Username;
+        string path = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\ТЕКСТОВЫЕ_ФАЙЛЫ\" + message.Chat.Username;
+        // string path = @"/data/Users/" + message.Chat.Username;
 
         List<string> lines = new List<string>(System.IO.File.ReadAllLines(path));
         char endSymbol = ';';
@@ -73,12 +73,30 @@ partial class Bot
                     reader.Close();
                 }
 
-                if (lineCount == 1) { LIST_OF_USERS[message.Chat.Username]++; }
-                else { LIST_OF_USERS[message.Chat.Username] += 3; }
+                LIST_OF_USERS[message.Chat.Username]++;
 
                 break;
 
             case 2: // ПРОИЗОШЕЛ ВЫБОР КОЛИЧЕСТВА ДУБЛОНОВ
+                ReplyKeyboardMarkup replyKeyboardMarkup1 = new(new[]
+                {
+                    new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
+                    new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
+                })
+                {
+                    ResizeKeyboard = true
+                };
+
+                await client.SendTextMessageAsync(
+                    message.Chat.Id,
+                    "Напишите цифрой количество наборов данного вида, которые хотели бы приобрести",
+                    replyMarkup: replyKeyboardMarkup1);
+
+                LIST_OF_USERS[message.Chat.Username]++;
+
+                break;
+
+            case 3: // ПРОИЗОШЕЛ ВВОД КОЛИЧЕСТВА ЗАКАЗОВ ОДНОГО ТИПА
                 lastLine = "";
                 using (StreamReader reader = new StreamReader(path))
                 {
@@ -90,13 +108,30 @@ partial class Bot
                     reader.Close();
                 }
 
-                RUSSIA_OR_NOT(message, lastLine);
+                if (LINE_COUNT(path) == 1) { RUSSIA_OR_NOT(message, lastLine); } // ОППРЕДЕЛЕНИЕ ВЫБРАННОГО РЕГИОНА ПОЛЬЗОВАТЕЛЕМ
+                else
+                {
+                    ReplyKeyboardMarkup replyKeyboardMarkup2 = new(new[]
+                    {
+                        new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
+                        new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
+                    })
+                    {
+                        ResizeKeyboard = true
+                    };
 
-                LIST_OF_USERS[message.Chat.Username]++;
+                    await client.SendTextMessageAsync(
+                        message.Chat.Id,
+                        "Пришлите ссылку для связи в соцсетях: ВК или Telegram",
+                        replyMarkup: replyKeyboardMarkup2);
+                }
+
+                if (LINE_COUNT(path) == 1) { LIST_OF_USERS[message.Chat.Username]++; }
+                else { LIST_OF_USERS[message.Chat.Username] += 3; }
 
                 break;
 
-            case 3: // ПРОИЗОШЕЛ ВВОД ЛОГИНА ОТ АККАУНТА
+            case 4:
                 ReplyKeyboardMarkup replyKeyboardMarkup3 = new(new[]
                 {
                     new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
@@ -115,7 +150,7 @@ partial class Bot
 
                 break;
 
-            case 4: // ПРОИЗОШЕЛ ВВОД ПАРОЛЯ ОТ АККАУНТА 
+            case 5: // ПРОИЗОШЕЛ ВВОД ПАРОЛЯ ОТ АККАУНТА 
                 ReplyKeyboardMarkup replyKeyboardMarkup4 = new(new[]
                 {
                     new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },

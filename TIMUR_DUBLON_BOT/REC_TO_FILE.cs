@@ -14,11 +14,11 @@ partial class Bot
 {
     private static async void REC_TO_FILE(Message message) // ЗАПИСЬ ИНФОРМАЦИИ В ФАЙЛ СО СПИСКОМ ЗАКАЗОВ ПОЛЬЗОВАТЕЛЯ
     {
-        string path1 = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT";
+        string path1 = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\ТЕКСТОВЫЕ_ФАЙЛЫ";
         // string path1 = @"/data/Users";
 
         string path = path1 + @"\" + message.Chat.Username;
-        //string path = path1 + message.Chat.Username;
+        //string path = path1 + @"/" + message.Chat.Username;
 
         switch (LIST_OF_USERS[message.Chat.Username])
         {
@@ -29,7 +29,7 @@ partial class Bot
                     writer.Close();
                 }
                 break;
-            case 6:
+            case 7:
                 using (StreamWriter writer = new StreamWriter(path, true))
                 {
                     await writer.WriteLineAsync(";   ПЕРЕВОД ВЫПОЛНЕН ✅   " + DateTime.Now.ToString());

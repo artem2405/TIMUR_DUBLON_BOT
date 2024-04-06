@@ -16,8 +16,8 @@ partial class Bot
     {
         LIST_OF_USERS[message.Chat.Username] = 0;
 
-        string path = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\" + message.Chat.Username;
-        // string path = @"/data/Users" + message.Chat.Username;
+        string path = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\ТЕКСТОВЫЕ_ФАЙЛЫ\" + message.Chat.Username;
+        // string path = @"/data/Users/" + message.Chat.Username;
 
         List<string> lines = new List<string>(System.IO.File.ReadAllLines(path));
         lines.RemoveAt(lines.Count - 1);

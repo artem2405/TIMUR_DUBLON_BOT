@@ -30,8 +30,8 @@ partial class Bot
 
         RASSYLKA_DATABASE(message); // ЗАПИСЬ ПОЛЬЗОВАТЕЛЯ В СПИСОК ПОЛЬЗОВАТЕЛЕЙ ДЛЯ РАССЫЛКИ
 
-        string path = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\" + message.Chat.Username;
-        // string path = @"/data/Users" + message.Chat.Username;
+        string path = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\ТЕКСТОВЫЕ_ФАЙЛЫ\" + message.Chat.Username;
+        // string path = @"/data/Users/" + message.Chat.Username;
 
         Console.WriteLine();
         Console.WriteLine($"От пользователя {message.Chat.Username} пришло сообщение с текстом: {message.Text}");
@@ -71,8 +71,7 @@ partial class Bot
 
                     VARIANT_OF_PURCHASE(message);
 
-                    if (LINE_COUNT(path) == 1) { LIST_OF_USERS[message.Chat.Username]++; }
-                    else { LIST_OF_USERS[message.Chat.Username] += 3; }
+                    LIST_OF_USERS[message.Chat.Username]++;
                 }
 
                 break;
@@ -89,6 +88,41 @@ partial class Bot
                         {
                             REC_TO_FILE(message);
 
+                            ReplyKeyboardMarkup replyKeyboardMarkup3 = new(new[]
+                            {
+                                new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
+                                new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
+                            })
+                            {
+                                ResizeKeyboard = true
+                            };
+
+                            await client.SendTextMessageAsync(
+                                message.Chat.Id,
+                                "Напишите цифрой количество наборов данного вида, которые хотели бы приобрести",
+                                replyMarkup: replyKeyboardMarkup3);
+
+                            LIST_OF_USERS[message.Chat.Username]++;
+                        }
+                        break;
+                }
+                break;
+
+            case 3: // ПРОИЗОШЕЛ ВВОД КОЛИЧЕСТВА ЗАКАЗОВ ОДНОГО ТИПА
+                switch (message.Text)
+                {
+                    case "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️":
+                        LIST_OF_USERS[message.Chat.Username] -= 2;
+                        PREVIOUS_STEP(message);
+                        break;
+
+                    case "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄":
+                        REBOOT_BOT(message);
+                        break;
+
+                    default:
+                        if (int.TryParse(message.Text, out int num) == true && num != 0)
+                        {
                             string lastLine = "";
                             using (StreamReader reader = new StreamReader(path))
                             {
@@ -100,16 +134,36 @@ partial class Bot
                                 reader.Close();
                             }
 
-                            RUSSIA_OR_NOT(message, lastLine);
 
-                            LIST_OF_USERS[message.Chat.Username]++;
+                            if (LINE_COUNT(path) == 1) { RUSSIA_OR_NOT(message, lastLine); } // ОППРЕДЕЛЕНИЕ ВЫБРАННОГО РЕГИОНА ПОЛЬЗОВАТЕЛЕМ
+                            else
+                            {
+                                ReplyKeyboardMarkup replyKeyboardMarkup3 = new(new[]
+                                {
+                                    new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
+                                    new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
+                                })
+                                {
+                                    ResizeKeyboard = true
+                                };
+
+                                await client.SendTextMessageAsync(
+                                    message.Chat.Id,
+                                    "Пришлите ссылку для связи в соцсетях: ВК или Telegram",
+                                    replyMarkup: replyKeyboardMarkup3);
+                            }
+
+                            message.Text = "!" + message.Text;
+                            REC_TO_FILE(message); // ЗАПИСЬ КОЛИЧЕСТВА ЗАКАЗОВ ОДНОГО ТИПА
+
+                            if (LINE_COUNT(path) == 1) { LIST_OF_USERS[message.Chat.Username]++; }
+                            else { LIST_OF_USERS[message.Chat.Username] += 3; }
                         }
-
                         break;
                 }
                 break;
 
-            case 3: // ПРОИЗОШЕЛ ВВОД ЛОГИНА ОТ АККАУНТА 
+            case 4: // ПРОИЗОШЕЛ ВВОД ЛОГИНА ОТ АККАУНТА 
                 switch (message.Text)
                 {
                     case "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️":
@@ -143,7 +197,7 @@ partial class Bot
                 }
                 break;
 
-            case 4: // ПРОИЗОШЕЛ ВВОД ПАРОЛЯ ОТ АККАУНТА 
+            case 5: // ПРОИЗОШЕЛ ВВОД ПАРОЛЯ ОТ АККАУНТА 
                 switch (message.Text)
                 {
                     case "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️":
@@ -174,7 +228,7 @@ partial class Bot
 
                             await client.SendTextMessageAsync(
                                 message.Chat.Id,
-                                "Пришлите ТЕКСТОВУЮ ссылку для связи в соцсетях: ВК или Telegram",
+                                "Пришлите ссылку для связи в соцсетях: ВК или Telegram",
                                 replyMarkup: replyKeyboardMarkup3);
 
                             LIST_OF_USERS[message.Chat.Username]++;
@@ -183,18 +237,65 @@ partial class Bot
                 }
                 break;
 
-            case 5: //ПРОИЗОШЕЛ ВВОД КОНТАКТНЫХ ДАННЫХ: ВК ИЛИ ТЕЛЕГРАММ   +   БОТ ВЫВОДИТ ДЛЯ ПОЛЬЗОВАТЕЛЯ ИНФОРМАЦИЮ О РЕКВИЗИТАХ ДЛЯ ОПЛАТЫ
-                int i = 0;
-                if (message.Type == MessageType.Photo && i == 1)
+            case 6: //ПРОИЗОШЕЛ ВВОД КОНТАКТНЫХ ДАННЫХ: ВК ИЛИ ТЕЛЕГРАММ + БОТ ВЫВОДИТ ДЛЯ ПОЛЬЗОВАТЕЛЯ ИНФОРМАЦИЮ О РЕКВИЗИТАХ ДЛЯ ОПЛАТЫ
+                if (message.Type == MessageType.Photo || message.Type == MessageType.Document)
                 {
-                    //PhotoSize photo = message.Photo[message.Photo.Length - 1];
-                    //string path1 = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT" + message.Chat.Username + @"_ССЫЛКА.jpg"; // В ПЕРВЫЕ КАВЫЧКИ ВСТАВИТЬ ПУТЬ ДИРРЕКТОРИИ
+                    string path1 = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\" + message.Chat.Username + @"_ФОТО-ССЫЛКА.jpg";
+                    // string path1 = @"/data/" + message.Chat.Username + @"_ФОТО-ССЫЛКА.jpg";
 
-                    //using (FileStream stream = new FileStream(path, FileMode.Create))
-                    //{
-                    //    await client.DownloadFileAsync(photo.FileId, stream);
-                    //    stream.Close();
-                    //}
+                    if (message.Type == MessageType.Photo)
+                    {
+                        string fileId = message.Photo[message.Photo.Length - 1].FileId;
+
+                        using (FileStream stream = new FileStream(path1, FileMode.Create))
+                        {
+                            await client.GetInfoAndDownloadFileAsync(fileId, stream);
+                            stream.Close();
+                        }
+                    }
+                    if (message.Type == MessageType.Document)
+                    {
+                        string fileId = message.Document.FileId;
+
+                        using (FileStream stream = new FileStream(path1, FileMode.Create))
+                        {
+                            await client.GetInfoAndDownloadFileAsync(fileId, stream);
+                            stream.Close();
+                        }
+                    }
+
+                    string fileContent = System.IO.File.ReadAllText(path); // ЧТЕНИЕ ФАЙЛА ПОЛЬЗОВАТЕЛЯ
+
+                    char targetChar = '₽';
+                    int Index = fileContent.IndexOf(targetChar);
+                    int StartIndex = fileContent.LastIndexOf('-', Index);
+                    string parsedString1 = fileContent.Substring(StartIndex + 1, Index - StartIndex - 1); // ПОИСК СТОИМОСТИ ЗАКАЗА
+
+                    targetChar = '!';
+                    StartIndex = fileContent.IndexOf(targetChar) + 1;
+                    int EndIndex = fileContent.IndexOf(';', StartIndex);
+                    string parsedString2 = fileContent.Substring(StartIndex, EndIndex - StartIndex); // ПОИСК КОЛИЧЕСТВА ЗАКАЗА
+
+                    ReplyKeyboardMarkup replyKeyboardMarkup3 = new(new[]
+                    {
+                        new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
+                        new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
+                    })
+                    {
+                        ResizeKeyboard = true
+                    };
+
+                    await client.SendTextMessageAsync(
+                        message.Chat.Id,
+                        "ИТОГОВАЯ СУММА К ОПЛАТЕ: <code>" + (int.Parse(parsedString1) * int.Parse(parsedString2)).ToString() + "</code> ₽" +
+                        "\n" +
+                        "\nСБП: <code>+79031986580</code> (Сбер, Альфа, Тинькофф)" +
+                        "\n" +
+                        "\nПОСЛЕ ЗАВЕРШЕНИЯ ОПЛАТЫ ОТПРАВЬТЕ СКРИНШОТ ОПЛАТЫ",
+                        parseMode: ParseMode.Html,
+                        replyMarkup: replyKeyboardMarkup3);
+
+                    LIST_OF_USERS[message.Chat.Username]++;
                 }
                 else
                 {
@@ -214,15 +315,20 @@ partial class Bot
                         default:
                             REC_TO_FILE(message);
 
+                            string fileContent = System.IO.File.ReadAllText(path); // ЧТЕНИЕ ФАЙЛА ПОЛЬЗОВАТЕЛЯ
+
                             char targetChar = '₽';
-                            string fileContent = System.IO.File.ReadAllText(path);
-                            int Index = fileContent.IndexOf(targetChar);
-                            int startIndex = fileContent.LastIndexOf('-', Index);
-                            string parsedString = fileContent.Substring(startIndex + 1, Index - startIndex - 1);
+                            int Index = fileContent.LastIndexOf(targetChar);
+                            int StartIndex = fileContent.LastIndexOf('-', Index);
+                            string parsedString1 = fileContent.Substring(StartIndex + 1, Index - StartIndex - 1); // ПОИСК СТОИМОСТИ ЗАКАЗА
+
+                            targetChar = '!';
+                            StartIndex = fileContent.LastIndexOf(targetChar) + 1;
+                            int EndIndex = fileContent.IndexOf(';', StartIndex);
+                            string parsedString2 = fileContent.Substring(StartIndex, EndIndex - StartIndex); // ПОИСК КОЛИЧЕСТВА ЗАКАЗА
 
                             ReplyKeyboardMarkup replyKeyboardMarkup3 = new(new[]
                             {
-                                // new KeyboardButton[] { "ПЕРЕВОД ВЫПОЛНЕН ✅" },
                                 new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
                                 new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
                             })
@@ -232,12 +338,11 @@ partial class Bot
 
                             await client.SendTextMessageAsync(
                                 message.Chat.Id,
-                                "СУММА К ОПЛАТЕ:<code>" + parsedString + "</code>₽" +
+                                "ИТОГОВАЯ СУММА К ОПЛАТЕ: <code>" + (int.Parse(parsedString1) * int.Parse(parsedString2)).ToString() + "</code> ₽" +
                                 "\n" +
                                 "\nСБП: <code>+79031986580</code> (Сбер, Альфа, Тинькофф)" +
                                 "\n" +
-                                //"\nПОСЛЕ ЗАВЕРШЕНИЯ ОПЛАТЫ НАЖМИТЕ НА КНОПКУ \"ПЕРЕВОД ВЫПОЛНЕН ✅\"",
-                                "\nПОСЛЕ ЗАВЕРШЕНИЯ ОПЛАТЫ ОТПРАВЬТЕ СКРИНШОТ ОПЛАТЫ",
+                                "\nПОСЛЕ ЗАВЕРШЕНИЯ ОПЛАТЫ ОТПРАВЬТЕ СКРИНШОТ С ПОДТВЕРЖДЕНИЕМ ОПЛАТЫ",
                                 parseMode: ParseMode.Html,
                                 replyMarkup: replyKeyboardMarkup3);
 
@@ -248,12 +353,12 @@ partial class Bot
                 }
                 break;
 
-            case 6: // ПРОИЗОШЛО НАЖАТИЕ НА ФИНАЛЬНУЮ КНОПКУ?
-                i = 1;
-                if ((message.Type == MessageType.Photo || message.Type == MessageType.Document) && i == 1)
+            case 7: // ПРОИЗОШЛА ОТПРАВКА СКРИНШОТА С ПОДТВЕРЖДЕНИЕМ ОПЛАТЫ
+                if (message.Type == MessageType.Photo || message.Type == MessageType.Document)
                 {
                     Random rnd = new Random();
-                    string path1 = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\" + message.Chat.Username + @"_ССЫЛКА_" + rnd.Next(0, 1000000) + ".jpg";
+                    string path1 = @"C:\Users\artem\Desktop\PROGS\TIMUR_DUBLON_BOT\" + message.Chat.Username + @"_СКРИН_ОПЛАТЫ_" + rnd.Next(0, 1000000) + ".jpg";
+                    // string path1 = @"/data/" + message.Chat.Username + @"_СКРИН_ОПЛАТЫ_" + rnd.Next(0, 1000000) + ".jpg";
 
                     if (message.Type == MessageType.Photo)
                     {
@@ -303,21 +408,17 @@ partial class Bot
                     using (FileStream stream = new FileStream(path1, FileMode.Open))
                     {
                         InputFileStream input = new InputFileStream(stream);
-                        await client.SendPhotoAsync(
-                            chatId: 432771577, // ВВЕСТИ СВОЙ АЙДИ ИЗ ТЕЛЕГРАМА
-                            photo: input,
-                            caption:
-                            "НОВЫЙ ЗАКАЗ! " +
-                            "\n" + lastLine +
-                            "\nИМЯ ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Username + ";  ID ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Id,
-                            parseMode: ParseMode.Html);
-                    }
+                        //await client.SendPhotoAsync(
+                        //    chatId: ,                 // ВВЕСТИ СВОЙ АЙДИ ИЗ ТЕЛЕГРАМА
+                        //    photo: input,
+                        //    caption:
+                        //    "НОВЫЙ ЗАКАЗ! " +
+                        //    "\n" + lastLine +
+                        //    "\nИМЯ ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Username + ";  ID ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Id,
+                        //    parseMode: ParseMode.Html);
 
-                    //await client.SendTextMessageAsync(
-                    //    ,
-                    //    "НОВЫЙ ЗАКАЗ! " + 
-                    //    "\n" + lastLine +
-                    //    "\nИМЯ ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Username + ";  ID ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Id);
+                        stream.Close();
+                    }
 
                     REC_TO_FILE(message);
 
@@ -327,42 +428,6 @@ partial class Bot
                 {
                     switch (message.Text)
                     {
-                        //case "ПЕРЕВОД ВЫПОЛНЕН ✅":
-                        //    ReplyKeyboardMarkup replyKeyboardMarkup4 = new(new[]
-                        //    {
-                        //        new KeyboardButton[] { "🆕 СОЗДАТЬ НОВЫЙ ЗАКАЗ 🆕" },
-                        //    })
-                        //    {
-                        //        ResizeKeyboard = true
-                        //    };
-
-                        //    await client.SendTextMessageAsync(
-                        //        message.Chat.Id,
-                        //        "Спасибо за заказ! В ближайшее время администратор с вами свяжется",
-                        //        replyMarkup: replyKeyboardMarkup4);
-
-                        //    string lastLine = ""; // ПОИСК ПОСЛЕДНЕЙ СТРОКИ В ФАЙЛЕ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ ДЛЯ ОТПРАВКИ АДМИНИСТРАТОРУ
-                        //    using (StreamReader reader = new StreamReader(path))
-                        //    {
-                        //        string line;
-                        //        while ((line = reader.ReadLine()) != null)
-                        //        {
-                        //            lastLine = line;
-                        //        }
-                        //        reader.Close();
-                        //    }
-
-                        //    //await client.SendTextMessageAsync(
-                        //    //    ,
-                        //    //    "НОВЫЙ ЗАКАЗ! " + 
-                        //    //    "\n" + lastLine +
-                        //    //    "\nИМЯ ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Username + ";  ID ПОЛЬЗОВАТЕЛЯ: " + message.Chat.Id);
-
-                        //    REC_TO_FILE(message);
-
-                        //    LIST_OF_USERS[message.Chat.Username] = 0;
-                        //    break;
-
                         case "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️":
                             LIST_OF_USERS[message.Chat.Username] -= 2;
                             PREVIOUS_STEP(message);
