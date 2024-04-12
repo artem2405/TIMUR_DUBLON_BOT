@@ -18,7 +18,7 @@ partial class Bot
         {
             new[]
             {
-                InlineKeyboardButton.WithUrl( text: "ПОДДЕРЖКА", url: "https://t.me/SERCH016"),
+                InlineKeyboardButton.WithUrl( text: "ПОДДЕРЖКА", url: "https://t.me/SERCH017"),
             },
             new[]
             {

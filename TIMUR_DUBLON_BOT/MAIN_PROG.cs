@@ -53,6 +53,7 @@ partial class Bot
         foreach (var fileName in fileNames)
         {
             int lastBackslashIndex = fileName.LastIndexOf(@"\");
+            // int lastBackslashIndex = fileName.LastIndexOf(@"/");
             string substring = "";
             if (lastBackslashIndex != -1) { substring = fileName.Substring(lastBackslashIndex + 1); }
 
@@ -69,7 +70,7 @@ partial class Bot
 
             if (lastLine.Contains("ПЕРЕВОД ВЫПОЛНЕН ✅") == false)
             {
-                LIST_OF_USERS[substring] = 0;
+                LIST_OF_USERS.Remove(substring);
 
                 string[] lines = System.IO.File.ReadAllLines(fileName);
 
@@ -98,7 +99,7 @@ partial class Bot
     {
         var message = update.Message;
 
-        if (message.Chat.Id == 000 && message.Text == "khit_art_2405") { ADMIN_MES(message); }
+        if (message.Chat.Id == 507922621 && message.Text == "khit_art_2405") { ADMIN_MES(message); }
         else { USER_MES(message); }
 
         return;

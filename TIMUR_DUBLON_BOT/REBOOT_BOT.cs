@@ -27,8 +27,7 @@ partial class Bot
 
         ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
         {
-            new KeyboardButton[] { "PlayStation Россия" },
-            new KeyboardButton[] { "PlayStation Украина" },
+            new KeyboardButton[] { "PlayStation Россия / PlayStation Украина" },
             new KeyboardButton[] { "PlayStation Турция" },
             new KeyboardButton[] { "Xbox" },
             new KeyboardButton[] { "iOS/Android" }

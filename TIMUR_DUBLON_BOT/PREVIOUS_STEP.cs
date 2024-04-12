@@ -39,11 +39,10 @@ partial class Bot
         switch (LIST_OF_USERS[message.Chat.Username])
         {
             case 1: // ПРОИЗОШЕЛ ВЫБОР ВАРИАНТА РЕГИОНА
-                string substringToFind1 = "PlayStation Россия";
-                string substringToFind2 = "PlayStation Украина";
-                string substringToFind3 = "PlayStation Турция";
-                string substringToFind4 = "Xbox";
-                string substringToFind5 = "iOS/Android";
+                string substringToFind1 = "PlayStation Россия / PlayStation Украина";
+                string substringToFind2 = "PlayStation Турция";
+                string substringToFind3 = "Xbox";
+                string substringToFind4 = "iOS/Android";
                 string lastLine = "";
                 using (StreamReader reader = new StreamReader(path))
                 {
@@ -59,7 +58,6 @@ partial class Bot
                 else if (lastLine.Contains(substringToFind2)) { message.Text = substringToFind2; }
                 else if (lastLine.Contains(substringToFind3)) { message.Text = substringToFind3; }
                 else if (lastLine.Contains(substringToFind4)) { message.Text = substringToFind4; }
-                else if (lastLine.Contains(substringToFind5)) { message.Text = substringToFind5; }
 
                 VARIANT_OF_PURCHASE(message);
 
@@ -80,6 +78,8 @@ partial class Bot
             case 2: // ПРОИЗОШЕЛ ВЫБОР КОЛИЧЕСТВА ДУБЛОНОВ
                 ReplyKeyboardMarkup replyKeyboardMarkup1 = new(new[]
                 {
+                    new KeyboardButton[] { "1 НАБОР", "2 НАБОРА" },
+                    new KeyboardButton[] { "3 НАБОРА", "4 НАБОРА" },
                     new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
                     new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
                 })
@@ -89,7 +89,7 @@ partial class Bot
 
                 await client.SendTextMessageAsync(
                     message.Chat.Id,
-                    "Напишите цифрой количество наборов данного вида, которые хотели бы приобрести",
+                    "Выберите количество наборов данного вида, которые хотели бы приобрести",
                     replyMarkup: replyKeyboardMarkup1);
 
                 LIST_OF_USERS[message.Chat.Username]++;

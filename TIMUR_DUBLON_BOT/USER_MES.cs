@@ -42,8 +42,7 @@ partial class Bot
             case 0: // ПЕРВОЕ СООБЩЕНИЕ
                 ReplyKeyboardMarkup replyKeyboardMarkup = new(new[]
                 {
-                    new KeyboardButton[] { "PlayStation Россия" },
-                    new KeyboardButton[] { "PlayStation Украина" },
+                    new KeyboardButton[] { "PlayStation Россия / PlayStation Украина" },
                     new KeyboardButton[] { "PlayStation Турция" },
                     new KeyboardButton[] { "Xbox" },
                     new KeyboardButton[] { "iOS/Android" }
@@ -90,6 +89,8 @@ partial class Bot
 
                             ReplyKeyboardMarkup replyKeyboardMarkup3 = new(new[]
                             {
+                                new KeyboardButton[] { "1 НАБОР", "2 НАБОРА" },
+                                new KeyboardButton[] { "3 НАБОРА", "4 НАБОРА" },
                                 new KeyboardButton[] { "↩️ ВЕРНУТЬСЯ НА ПРЕДЫДУЩИЙ ШАГ ↩️" },
                                 new KeyboardButton[] { "🔄 ПЕРЕЗАПУСТИТЬ БОТА 🔄" },
                             })
@@ -99,7 +100,7 @@ partial class Bot
 
                             await client.SendTextMessageAsync(
                                 message.Chat.Id,
-                                "Напишите цифрой количество наборов данного вида, которые хотели бы приобрести",
+                                "Выберите количество наборов данного вида, которые хотели бы приобрести",
                                 replyMarkup: replyKeyboardMarkup3);
 
                             LIST_OF_USERS[message.Chat.Username]++;
@@ -121,6 +122,21 @@ partial class Bot
                         break;
 
                     default:
+                        switch (message.Text)
+                        {
+                            case "1 НАБОР":
+                                message.Text = "1";
+                                break;
+                            case "2 НАБОРА":
+                                message.Text = "2";
+                                break;
+                            case "3 НАБОРА":
+                                message.Text = "3";
+                                break;
+                            case "4 НАБОРА":
+                                message.Text = "4";
+                                break;
+                        }
                         if (int.TryParse(message.Text, out int num) == true && num != 0)
                         {
                             string lastLine = "";
@@ -134,8 +150,7 @@ partial class Bot
                                 reader.Close();
                             }
 
-
-                            if (LINE_COUNT(path) == 1) { RUSSIA_OR_NOT(message, lastLine); } // ОППРЕДЕЛЕНИЕ ВЫБРАННОГО РЕГИОНА ПОЛЬЗОВАТЕЛЕМ
+                            if (LINE_COUNT(path) == 1) { RUSSIA_OR_NOT(message, lastLine); } // ОПРЕДЕЛЕНИЕ ВЫБРАННОГО РЕГИОНА ПОЛЬЗОВАТЕЛЕМ
                             else
                             {
                                 ReplyKeyboardMarkup replyKeyboardMarkup3 = new(new[]
@@ -422,7 +437,7 @@ partial class Bot
 
                     REC_TO_FILE(message);
 
-                    LIST_OF_USERS[message.Chat.Username] = 0;
+                    LIST_OF_USERS.Remove(message.Chat.Username);
                 }
                 else
                 {
