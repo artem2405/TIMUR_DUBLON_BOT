@@ -9,7 +9,7 @@ partial class Bot
 {
     private static async void ADMIN_MES(Message message)
     {
-        if (message.Text == "khit_art_2405") // ПАРОЛЬ ДЛЯ АКТИВАЦИИ РАССЫЛКИ
+        if (message.Text == "khit_art_2405")
         {
             string path1 = @"C:\Users\artem\Desktop\PROGS\💻💻💻ФАЙЛЫ ДЛЯ TIMUR_DUBLON_BOT💻💻💻\РАССЫЛКА.txt";
             string path2 = @"C:\Users\artem\Desktop\PROGS\💻💻💻ФАЙЛЫ ДЛЯ TIMUR_DUBLON_BOT💻💻💻\СПИСОК_ID_ПОЛЬЗОВАТЕЛЕЙ.txt";
@@ -17,7 +17,7 @@ partial class Bot
 
             // string path1 = @"/data/Pictures/РАССЫЛКА.txt"; // ПУТЬ К ФАЙЛУ С ТЕКСТОМ РАССЫЛКИ
             // string path2 = @"/data/Pictures/ID"; // ПУТЬ К ФАЙЛУ СО СПИСКОМ ПОЛЬЗОВАТЕЛЕЙ ДЛЯ РАССЫЛКИ
-            // string path = @"/data/Users/РАССЫЛКА.png";
+            // string path3 = @"/data/Users/РАССЫЛКА.png";
 
             string text = "";
             using (StreamReader reader = new StreamReader(path1)) { text = await reader.ReadToEndAsync(); reader.Close(); }

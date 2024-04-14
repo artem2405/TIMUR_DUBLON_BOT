@@ -99,7 +99,7 @@ partial class Bot
     {
         var message = update.Message;
 
-        if (message.Chat.Id == 507922621 && message.Text == "khit_art_2405") { ADMIN_MES(message); }
+        if (message.Chat.Id == 000 && message.Text == "khit_art_2405") { ADMIN_MES(message); }
         else { USER_MES(message); }
 
         return;
