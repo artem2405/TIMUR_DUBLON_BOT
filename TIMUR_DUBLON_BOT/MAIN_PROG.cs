@@ -80,6 +80,7 @@ partial class Bot
                     System.IO.File.WriteAllLines(fileName, lines);
                 }
             }
+            if (LINE_COUNT(fileName) == 0) { System.IO.File.Delete(fileName); }
         }
     }
 

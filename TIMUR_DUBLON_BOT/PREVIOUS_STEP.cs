@@ -39,7 +39,7 @@ partial class Bot
         switch (LIST_OF_USERS[message.Chat.Username])
         {
             case 1: // ПРОИЗОШЕЛ ВЫБОР ВАРИАНТА РЕГИОНА
-                string substringToFind1 = "PlayStation Россия / PlayStation Украина";
+                string substringToFind1 = "PlayStation";
                 string substringToFind2 = "PlayStation Турция";
                 string substringToFind3 = "Xbox";
                 string substringToFind4 = "iOS/Android";
@@ -122,7 +122,9 @@ partial class Bot
 
                     await client.SendTextMessageAsync(
                         message.Chat.Id,
-                        "Пришлите ссылку для связи в соцсетях: ВК или Telegram",
+                        "\nПОВТОРНО пришлите ТЕКСТОВУЮ ссылку для связи в соцсетях: ВК или Telegram" +
+                        "\n" +
+                        "\n(Если вы уже произвели оплату, то НА СЛЕДУЮЩЕМ ШАГЕ просто пришлите скриншот выполненной оплаты)",
                         replyMarkup: replyKeyboardMarkup2);
                 }
 
@@ -162,7 +164,9 @@ partial class Bot
 
                 await client.SendTextMessageAsync(
                     message.Chat.Id,
-                    "Пришлите ТЕКСТОВУЮ ссылку для связи в соцсетях: ВК или Telegram",
+                    "\nПОВТОРНО пришлите ТЕКСТОВУЮ ссылку для связи в соцсетях: ВК или Telegram" +
+                    "\n" +
+                    "\n(Если вы уже произвели оплату, то НА СЛЕДУЮЩЕМ ШАГЕ просто пришлите скриншот выполненной оплаты)",
                     replyMarkup: replyKeyboardMarkup4);
 
                 LIST_OF_USERS[message.Chat.Username]++;

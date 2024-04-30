@@ -21,7 +21,7 @@ partial class Bot
         //string substringToFind4 = "Xbox";
         //string substringToFind5 = "iOS/Android";
 
-        string substringToFind1 = "PlayStation Россия / PlayStation Украина";
+        string substringToFind1 = "PlayStation";
         string substringToFind2 = "PlayStation Турция";
         string substringToFind3 = "Xbox";
         string substringToFind4 = "iOS/Android";
@@ -41,8 +41,7 @@ partial class Bot
             await client.SendTextMessageAsync(
                 message.Chat.Id,
                 "\nВы ранее заходили в свой аккаунт кораблей через мобильное приложение Legends?" +
-                "\n   ❶ Если ДА, то пришлите логин от аккаунта Facebook/Google, используемого для входа, " +
-                "\n      с указанием способа входа - Facebook или Google" +
+                "\n   ❶ Если ДА, то пришлите логин от аккаунта Facebook, используемого для входа, с указанием способа входа - Facebook" +
                 "\n   ❷ Если НЕТ, то пришлите логин от вашего аккаунта PlayStation",
                 replyMarkup: replyKeyboardMarkup1);
         }
@@ -77,8 +76,7 @@ partial class Bot
             await client.SendTextMessageAsync(
                 message.Chat.Id,
                 "\nВы ранее заходили в свой аккаунт кораблей через мобильное приложение Legends?" +
-                "\n   ❶ Если ДА, то пришлите логин от аккаунта Facebook/Google, используемого для входа, " +
-                "\n      с указанием способа входа - Facebook или Google" +
+                "\n   ❶ Если ДА, то пришлите логин от аккаунта Facebook, используемого для вход, с указанием способа входа - Facebook" +
                 "\n   ❷ Если НЕТ, то пришлите логин от вашего аккаунта Xbox",
                 replyMarkup: replyKeyboardMarkup2);
         }
@@ -95,8 +93,7 @@ partial class Bot
 
             await client.SendTextMessageAsync(
                 message.Chat.Id,
-                "\nПришлите логин от аккаунта Facebook/Google, используемого для входа, " +
-                "\nс указанием способа входа - Facebook или Google",
+                "\nПришлите логин от аккаунта Facebook, используемого для вход, с указанием способа входа - Facebook",
                 replyMarkup: replyKeyboardMarkup2);
         }
     }
